@@ -7,55 +7,59 @@ part of 'random_binary_projection_searcher_impl.dart';
 // **************************************************************************
 
 RandomBinaryProjectionSearcherImpl _$RandomBinaryProjectionSearcherImplFromJson(
-    Map<String, dynamic> json) {
-  return $checkedNew('RandomBinaryProjectionSearcherImpl', json, () {
-    $checkKeys(json, allowedKeys: const ['S', 'D', 'H', 'P', 'R', 'B', r'$V']);
-    final val = RandomBinaryProjectionSearcherImpl(
-      $checkedConvert(
-          json, 'H', (v) => (v as List<dynamic>).map((e) => e as String)),
-      $checkedConvert(
-          json, 'P', (v) => Matrix.fromJson(v as Map<String, dynamic>)),
-      $checkedConvert(json, 'D', (v) => v as int),
-      seed: $checkedConvert(json, 'S', (v) => v as int?),
-      schemaVersion: $checkedConvert(json, r'$V', (v) => v as int),
+        Map<String, dynamic> json) =>
+    $checkedCreate(
+      'RandomBinaryProjectionSearcherImpl',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
+          json,
+          allowedKeys: const ['S', 'D', 'H', 'P', 'R', 'B', r'$V'],
+        );
+        final val = RandomBinaryProjectionSearcherImpl(
+          $checkedConvert(
+              'H', (v) => (v as List<dynamic>).map((e) => e as String)),
+          $checkedConvert(
+              'P', (v) => Matrix.fromJson(v as Map<String, dynamic>)),
+          $checkedConvert('D', (v) => (v as num).toInt()),
+          seed: $checkedConvert('S', (v) => (v as num?)?.toInt()),
+          schemaVersion:
+              $checkedConvert(r'$V', (v) => (v as num?)?.toInt() ?? 1),
+        );
+        $checkedConvert(
+            'R',
+            (v) =>
+                val.randomVectors = Matrix.fromJson(v as Map<String, dynamic>));
+        $checkedConvert(
+            'B',
+            (v) => val.bins = (v as Map<String, dynamic>).map(
+                  (k, e) => MapEntry(
+                      int.parse(k),
+                      (e as List<dynamic>)
+                          .map((e) => (e as num).toInt())
+                          .toList()),
+                ));
+        return val;
+      },
+      fieldKeyMap: const {
+        'columns': 'H',
+        'points': 'P',
+        'digitCapacity': 'D',
+        'seed': 'S',
+        'schemaVersion': r'$V',
+        'randomVectors': 'R',
+        'bins': 'B'
+      },
     );
-    $checkedConvert(json, 'R',
-        (v) => val.randomVectors = Matrix.fromJson(v as Map<String, dynamic>));
-    $checkedConvert(
-        json,
-        'B',
-        (v) => val.bins = (v as Map<String, dynamic>).map(
-              (k, e) => MapEntry(int.parse(k),
-                  (e as List<dynamic>).map((e) => e as int).toList()),
-            ));
-    return val;
-  }, fieldKeyMap: const {
-    'columns': 'H',
-    'points': 'P',
-    'digitCapacity': 'D',
-    'seed': 'S',
-    'schemaVersion': r'$V',
-    'randomVectors': 'R',
-    'bins': 'B'
-  });
-}
 
 Map<String, dynamic> _$RandomBinaryProjectionSearcherImplToJson(
-    RandomBinaryProjectionSearcherImpl instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('S', instance.seed);
-  val['D'] = instance.digitCapacity;
-  val['H'] = instance.columns.toList();
-  val['P'] = instance.points.toJson();
-  val['R'] = instance.randomVectors.toJson();
-  val['B'] = instance.bins.map((k, e) => MapEntry(k.toString(), e));
-  val[r'$V'] = instance.schemaVersion;
-  return val;
-}
+        RandomBinaryProjectionSearcherImpl instance) =>
+    <String, dynamic>{
+      if (instance.seed case final value?) 'S': value,
+      'D': instance.digitCapacity,
+      'H': instance.columns.toList(),
+      'P': instance.points.toJson(),
+      'R': instance.randomVectors.toJson(),
+      'B': instance.bins.map((k, e) => MapEntry(k.toString(), e)),
+      r'$V': instance.schemaVersion,
+    };

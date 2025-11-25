@@ -6,13 +6,19 @@ part of 'softmax_link_function.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-SoftmaxLinkFunction _$SoftmaxLinkFunctionFromJson(Map<String, dynamic> json) {
-  return $checkedNew('SoftmaxLinkFunction', json, () {
-    $checkKeys(json, allowedKeys: const []);
-    final val = SoftmaxLinkFunction();
-    return val;
-  });
-}
+SoftmaxLinkFunction _$SoftmaxLinkFunctionFromJson(Map<String, dynamic> json) =>
+    $checkedCreate(
+      'SoftmaxLinkFunction',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
+          json,
+          allowedKeys: const [],
+        );
+        final val = SoftmaxLinkFunction();
+        return val;
+      },
+    );
 
 Map<String, dynamic> _$SoftmaxLinkFunctionToJson(
         SoftmaxLinkFunction instance) =>

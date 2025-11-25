@@ -6,47 +6,45 @@ part of 'knn_solver_impl.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-KnnSolverImpl _$KnnSolverImplFromJson(Map<String, dynamic> json) {
-  return $checkedNew('KnnSolverImpl', json, () {
-    $checkKeys(json, allowedKeys: const ['F', 'O', 'K', 'D', 'S', r'$V']);
-    final val = KnnSolverImpl(
-      $checkedConvert(
-          json, 'F', (v) => Matrix.fromJson(v as Map<String, dynamic>)),
-      $checkedConvert(
-          json, 'O', (v) => Matrix.fromJson(v as Map<String, dynamic>)),
-      $checkedConvert(json, 'K', (v) => v as int),
-      $checkedConvert(json, 'D',
-          (v) => const DistanceTypeJsonConverter().fromJson(v as String)),
-      $checkedConvert(json, 'S', (v) => v as bool),
-      schemaVersion: $checkedConvert(json, r'$V', (v) => v as int?),
+KnnSolverImpl _$KnnSolverImplFromJson(Map<String, dynamic> json) =>
+    $checkedCreate(
+      'KnnSolverImpl',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
+          json,
+          allowedKeys: const ['F', 'O', 'K', 'D', 'S', r'$V'],
+        );
+        final val = KnnSolverImpl(
+          $checkedConvert(
+              'F', (v) => Matrix.fromJson(v as Map<String, dynamic>)),
+          $checkedConvert(
+              'O', (v) => Matrix.fromJson(v as Map<String, dynamic>)),
+          $checkedConvert('K', (v) => (v as num).toInt()),
+          $checkedConvert('D',
+              (v) => const DistanceTypeJsonConverter().fromJson(v as String)),
+          $checkedConvert('S', (v) => v as bool),
+          schemaVersion: $checkedConvert(
+              r'$V', (v) => (v as num?)?.toInt() ?? knnSolverJsonSchemaVersion),
+        );
+        return val;
+      },
+      fieldKeyMap: const {
+        'trainFeatures': 'F',
+        'trainOutcomes': 'O',
+        'k': 'K',
+        'distanceType': 'D',
+        'standardize': 'S',
+        'schemaVersion': r'$V'
+      },
     );
-    return val;
-  }, fieldKeyMap: const {
-    'trainFeatures': 'F',
-    'trainOutcomes': 'O',
-    'k': 'K',
-    'distanceType': 'D',
-    'standardize': 'S',
-    'schemaVersion': r'$V'
-  });
-}
 
-Map<String, dynamic> _$KnnSolverImplToJson(KnnSolverImpl instance) {
-  final val = <String, dynamic>{
-    'F': instance.trainFeatures.toJson(),
-    'O': instance.trainOutcomes.toJson(),
-    'K': instance.k,
-  };
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull(
-      'D', const DistanceTypeJsonConverter().toJson(instance.distanceType));
-  val['S'] = instance.standardize;
-  writeNotNull(r'$V', instance.schemaVersion);
-  return val;
-}
+Map<String, dynamic> _$KnnSolverImplToJson(KnnSolverImpl instance) =>
+    <String, dynamic>{
+      'F': instance.trainFeatures.toJson(),
+      'O': instance.trainOutcomes.toJson(),
+      'K': instance.k,
+      'D': const DistanceTypeJsonConverter().toJson(instance.distanceType),
+      'S': instance.standardize,
+      if (instance.schemaVersion case final value?) r'$V': value,
+    };

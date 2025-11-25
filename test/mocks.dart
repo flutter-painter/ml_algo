@@ -118,6 +118,7 @@ MockLearningRateIterableFactory createLearningRateGeneratorFactoryMock(
       initialValue: anyNamed('initialValue'),
       decay: anyNamed('decay'),
       iterationLimit: anyNamed('iterationLimit'),
+      dropRate: null,
     ),
   ).thenReturn(iterable);
 

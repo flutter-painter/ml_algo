@@ -6,6 +6,7 @@ import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_cl
 import 'package:ml_algo/src/common/constants/default_parameters/common.dart';
 import 'package:ml_algo/src/common/serializable/serializable.dart';
 import 'package:ml_algo/src/model_selection/assessable.dart';
+import 'package:ml_algo/src/persistence/tree_store.dart';
 import 'package:ml_algo/src/predictor/retrainable.dart';
 import 'package:ml_algo/src/tree_trainer/tree_assessor/tree_assessor_type.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
@@ -158,4 +159,38 @@ abstract class DecisionTreeClassifier
   ///
   /// The file 'tree.svg' now contains a graphical representation of the tree
   Future<File> saveAsSvg(String filePath);
+
+  /// Saves the classifier to a TreeStore
+  ///
+  /// Parameters:
+  /// - [store] The TreeStore instance to save to
+  /// - [treeId] Optional custom tree ID. If not provided, generates one.
+  ///
+  /// Returns the tree ID
+  ///
+  /// Example:
+  /// ```dart
+  /// final store = SembastTreeStore(database: database);
+  /// final treeId = await classifier.saveToStore(store);
+  /// ```
+  Future<String> saveToStore(TreeStore store, {String? treeId});
+
+  /// Loads a classifier from a TreeStore
+  ///
+  /// Parameters:
+  /// - [store] The TreeStore instance to load from
+  /// - [treeId] The ID of the tree to load
+  ///
+  /// Returns the loaded DecisionTreeClassifier, or null if not found
+  ///
+  /// Example:
+  /// ```dart
+  /// final store = SembastTreeStore(database: database);
+  /// final classifier = await DecisionTreeClassifier.loadFromStore(store, treeId);
+  /// ```
+  static Future<DecisionTreeClassifier?> loadFromStore(
+    TreeStore store,
+    String treeId,
+  ) =>
+      store.loadTree(treeId);
 }

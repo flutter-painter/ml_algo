@@ -6,148 +6,149 @@ part of 'softmax_regressor_impl.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-SoftmaxRegressorImpl _$SoftmaxRegressorImplFromJson(Map<String, dynamic> json) {
-  return $checkedNew('SoftmaxRegressorImpl', json, () {
-    $checkKeys(json, allowedKeys: const [
-      'OT',
-      'IL',
-      'ILR',
-      'D',
-      'DR',
-      'MCU',
-      'L',
-      'RT',
-      'RS',
-      'BS',
-      'FDN',
-      'LR',
-      'ICT',
-      'IC',
-      'CN',
-      'FI',
-      'IS',
-      'CBC',
-      'DT',
-      'LF',
-      'PL',
-      'NL',
-      'CPI',
-      r'$V'
-    ]);
-    final val = SoftmaxRegressorImpl(
-      $checkedConvert(
+SoftmaxRegressorImpl _$SoftmaxRegressorImplFromJson(
+        Map<String, dynamic> json) =>
+    $checkedCreate(
+      'SoftmaxRegressorImpl',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
           json,
-          'OT',
-          (v) =>
-              const LinearOptimizerTypeJsonConverter().fromJson(v as String)),
-      $checkedConvert(json, 'IL', (v) => v as int),
-      $checkedConvert(json, 'ILR', (v) => (v as num).toDouble()),
-      $checkedConvert(json, 'D', (v) => (v as num).toDouble()),
-      $checkedConvert(json, 'DR', (v) => v as int),
-      $checkedConvert(json, 'MCU', (v) => (v as num).toDouble()),
-      $checkedConvert(json, 'L', (v) => (v as num).toDouble()),
-      $checkedConvert(
-          json,
-          'RT',
-          (v) => const RegularizationTypeJsonConverterNullable()
-              .fromJson(v as String?)),
-      $checkedConvert(json, 'RS', (v) => v as int?),
-      $checkedConvert(json, 'BS', (v) => v as int),
-      $checkedConvert(json, 'FDN', (v) => v as bool),
-      $checkedConvert(json, 'LR',
-          (v) => const LearningRateTypeJsonConverter().fromJson(v as String)),
-      $checkedConvert(
-          json,
-          'ICT',
-          (v) => const InitialCoefficientsTypeJsonConverter()
-              .fromJson(v as String)),
-      $checkedConvert(json, 'IC',
-          (v) => v == null ? null : Matrix.fromJson(v as Map<String, dynamic>)),
-      $checkedConvert(
-          json, 'CBC', (v) => Matrix.fromJson(v as Map<String, dynamic>)),
-      $checkedConvert(
-          json, 'CN', (v) => (v as List<dynamic>).map((e) => e as String)),
-      $checkedConvert(json, 'LF', (v) => fromLinkFunctionJson(v as String)),
-      $checkedConvert(json, 'FI', (v) => v as bool),
-      $checkedConvert(json, 'IS', (v) => v as num),
-      $checkedConvert(json, 'PL', (v) => v as num),
-      $checkedConvert(json, 'NL', (v) => v as num),
-      $checkedConvert(json, 'CPI',
-          (v) => (v as List<dynamic>?)?.map((e) => e as num).toList()),
-      $checkedConvert(
-          json, 'DT', (v) => const DTypeJsonConverter().fromJson(v as String)),
-      schemaVersion: $checkedConvert(json, r'$V', (v) => v as int?),
+          allowedKeys: const [
+            'OT',
+            'IL',
+            'ILR',
+            'D',
+            'DR',
+            'MCU',
+            'L',
+            'RT',
+            'RS',
+            'BS',
+            'FDN',
+            'LR',
+            'ICT',
+            'IC',
+            'CN',
+            'FI',
+            'IS',
+            'CBC',
+            'DT',
+            'LF',
+            'PL',
+            'NL',
+            'CPI',
+            r'$V'
+          ],
+        );
+        final val = SoftmaxRegressorImpl(
+          $checkedConvert(
+              'OT',
+              (v) => const LinearOptimizerTypeJsonConverter()
+                  .fromJson(v as String)),
+          $checkedConvert('IL', (v) => (v as num).toInt()),
+          $checkedConvert('ILR', (v) => (v as num).toDouble()),
+          $checkedConvert('D', (v) => (v as num).toDouble()),
+          $checkedConvert('DR', (v) => (v as num).toInt()),
+          $checkedConvert('MCU', (v) => (v as num).toDouble()),
+          $checkedConvert('L', (v) => (v as num).toDouble()),
+          $checkedConvert(
+              'RT',
+              (v) => const RegularizationTypeJsonConverterNullable()
+                  .fromJson(v as String?)),
+          $checkedConvert('RS', (v) => (v as num?)?.toInt()),
+          $checkedConvert('BS', (v) => (v as num).toInt()),
+          $checkedConvert('FDN', (v) => v as bool),
+          $checkedConvert(
+              'LR',
+              (v) =>
+                  const LearningRateTypeJsonConverter().fromJson(v as String)),
+          $checkedConvert(
+              'ICT',
+              (v) => const InitialCoefficientsTypeJsonConverter()
+                  .fromJson(v as String)),
+          $checkedConvert(
+              'IC',
+              (v) => v == null
+                  ? null
+                  : Matrix.fromJson(v as Map<String, dynamic>)),
+          $checkedConvert(
+              'CBC', (v) => Matrix.fromJson(v as Map<String, dynamic>)),
+          $checkedConvert(
+              'CN', (v) => (v as List<dynamic>).map((e) => e as String)),
+          $checkedConvert('LF', (v) => fromLinkFunctionJson(v as String)),
+          $checkedConvert('FI', (v) => v as bool),
+          $checkedConvert('IS', (v) => v as num),
+          $checkedConvert('PL', (v) => v as num),
+          $checkedConvert('NL', (v) => v as num),
+          $checkedConvert('CPI',
+              (v) => (v as List<dynamic>?)?.map((e) => e as num).toList()),
+          $checkedConvert(
+              'DT', (v) => const DTypeJsonConverter().fromJson(v as String)),
+          schemaVersion: $checkedConvert(r'$V',
+              (v) => (v as num?)?.toInt() ?? softmaxRegressorJsonSchemaVersion),
+        );
+        return val;
+      },
+      fieldKeyMap: const {
+        'optimizerType': 'OT',
+        'iterationsLimit': 'IL',
+        'initialLearningRate': 'ILR',
+        'decay': 'D',
+        'dropRate': 'DR',
+        'minCoefficientsUpdate': 'MCU',
+        'lambda': 'L',
+        'regularizationType': 'RT',
+        'randomSeed': 'RS',
+        'batchSize': 'BS',
+        'isFittingDataNormalized': 'FDN',
+        'learningRateType': 'LR',
+        'initialCoefficientsType': 'ICT',
+        'initialCoefficients': 'IC',
+        'coefficientsByClasses': 'CBC',
+        'targetNames': 'CN',
+        'linkFunction': 'LF',
+        'fitIntercept': 'FI',
+        'interceptScale': 'IS',
+        'positiveLabel': 'PL',
+        'negativeLabel': 'NL',
+        'costPerIteration': 'CPI',
+        'dtype': 'DT',
+        'schemaVersion': r'$V'
+      },
     );
-    return val;
-  }, fieldKeyMap: const {
-    'optimizerType': 'OT',
-    'iterationsLimit': 'IL',
-    'initialLearningRate': 'ILR',
-    'decay': 'D',
-    'dropRate': 'DR',
-    'minCoefficientsUpdate': 'MCU',
-    'lambda': 'L',
-    'regularizationType': 'RT',
-    'randomSeed': 'RS',
-    'batchSize': 'BS',
-    'isFittingDataNormalized': 'FDN',
-    'learningRateType': 'LR',
-    'initialCoefficientsType': 'ICT',
-    'initialCoefficients': 'IC',
-    'coefficientsByClasses': 'CBC',
-    'targetNames': 'CN',
-    'linkFunction': 'LF',
-    'fitIntercept': 'FI',
-    'interceptScale': 'IS',
-    'positiveLabel': 'PL',
-    'negativeLabel': 'NL',
-    'costPerIteration': 'CPI',
-    'dtype': 'DT',
-    'schemaVersion': r'$V'
-  });
-}
 
 Map<String, dynamic> _$SoftmaxRegressorImplToJson(
-    SoftmaxRegressorImpl instance) {
-  final val = <String, dynamic>{};
-
-  void writeNotNull(String key, dynamic value) {
-    if (value != null) {
-      val[key] = value;
-    }
-  }
-
-  writeNotNull('OT',
-      const LinearOptimizerTypeJsonConverter().toJson(instance.optimizerType));
-  val['IL'] = instance.iterationsLimit;
-  val['ILR'] = instance.initialLearningRate;
-  val['D'] = instance.decay;
-  val['DR'] = instance.dropRate;
-  val['MCU'] = instance.minCoefficientsUpdate;
-  val['L'] = instance.lambda;
-  writeNotNull(
-      'RT',
-      const RegularizationTypeJsonConverterNullable()
-          .toJson(instance.regularizationType));
-  writeNotNull('RS', instance.randomSeed);
-  val['BS'] = instance.batchSize;
-  val['FDN'] = instance.isFittingDataNormalized;
-  writeNotNull('LR',
-      const LearningRateTypeJsonConverter().toJson(instance.learningRateType));
-  writeNotNull(
-      'ICT',
-      const InitialCoefficientsTypeJsonConverter()
-          .toJson(instance.initialCoefficientsType));
-  writeNotNull('IC', instance.initialCoefficients?.toJson());
-  val['CN'] = instance.targetNames.toList();
-  val['FI'] = instance.fitIntercept;
-  val['IS'] = instance.interceptScale;
-  val['CBC'] = instance.coefficientsByClasses.toJson();
-  writeNotNull('DT', const DTypeJsonConverter().toJson(instance.dtype));
-  writeNotNull('LF', linkFunctionToJson(instance.linkFunction));
-  val['PL'] = instance.positiveLabel;
-  val['NL'] = instance.negativeLabel;
-  writeNotNull('CPI', instance.costPerIteration);
-  writeNotNull(r'$V', instance.schemaVersion);
-  return val;
-}
+        SoftmaxRegressorImpl instance) =>
+    <String, dynamic>{
+      'OT': const LinearOptimizerTypeJsonConverter()
+          .toJson(instance.optimizerType),
+      'IL': instance.iterationsLimit,
+      'ILR': instance.initialLearningRate,
+      'D': instance.decay,
+      'DR': instance.dropRate,
+      'MCU': instance.minCoefficientsUpdate,
+      'L': instance.lambda,
+      if (const RegularizationTypeJsonConverterNullable()
+              .toJson(instance.regularizationType)
+          case final value?)
+        'RT': value,
+      if (instance.randomSeed case final value?) 'RS': value,
+      'BS': instance.batchSize,
+      'FDN': instance.isFittingDataNormalized,
+      'LR': const LearningRateTypeJsonConverter()
+          .toJson(instance.learningRateType),
+      'ICT': const InitialCoefficientsTypeJsonConverter()
+          .toJson(instance.initialCoefficientsType),
+      if (instance.initialCoefficients?.toJson() case final value?) 'IC': value,
+      'CN': instance.targetNames.toList(),
+      'FI': instance.fitIntercept,
+      'IS': instance.interceptScale,
+      'CBC': instance.coefficientsByClasses.toJson(),
+      'DT': const DTypeJsonConverter().toJson(instance.dtype),
+      'LF': linkFunctionToJson(instance.linkFunction),
+      'PL': instance.positiveLabel,
+      'NL': instance.negativeLabel,
+      if (instance.costPerIteration case final value?) 'CPI': value,
+      if (instance.schemaVersion case final value?) r'$V': value,
+    };

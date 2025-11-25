@@ -11,6 +11,7 @@ import 'package:ml_algo/src/classifier/decision_tree_classifier/helpers/create_t
 import 'package:ml_algo/src/common/constants/common_json_keys.dart';
 import 'package:ml_algo/src/common/json_converter/dtype_json_converter.dart';
 import 'package:ml_algo/src/common/serializable/serializable_mixin.dart';
+import 'package:ml_algo/src/persistence/tree_store.dart';
 import 'package:ml_algo/src/tree_trainer/leaf_label/leaf_label.dart';
 import 'package:ml_algo/src/tree_trainer/tree_assessor/helpers/from_tree_assessor_type_json.dart';
 import 'package:ml_algo/src/tree_trainer/tree_assessor/helpers/to_tree_assessor_type_json.dart';
@@ -165,5 +166,18 @@ class DecisionTreeClassifierImpl
     final file = await File(filePath).create(recursive: true);
 
     return file.writeAsString(markup);
+  }
+
+  @override
+  Future<String> saveToStore(TreeStore store, {String? treeId}) async {
+    return await store.saveTree(this, treeId: treeId);
+  }
+
+  /// Static factory method to load from TreeStore
+  static Future<DecisionTreeClassifier?> loadFromStore(
+    TreeStore store,
+    String treeId,
+  ) async {
+    return await store.loadTree(treeId);
   }
 }

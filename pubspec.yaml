@@ -4,7 +4,7 @@ version: 16.18.0
 homepage: https://github.com/gyrdym/ml_algo
 
 environment:
-  sdk: '>=2.12.0 <4.0.0'
+  sdk: '>=3.0.0 <4.0.0'
 
 dependencies:
   collection: ^1.16.0
@@ -15,6 +15,7 @@ dependencies:
   ml_preprocessing: ^7.0.2
   quiver: ^3.0.0
   xrange: ^2.0.0
+  sembast: ^3.0.0
 
 dev_dependencies:
   benchmark_harness: ^2.0.0

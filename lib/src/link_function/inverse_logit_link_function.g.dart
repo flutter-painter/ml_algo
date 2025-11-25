@@ -7,13 +7,19 @@ part of 'inverse_logit_link_function.dart';
 // **************************************************************************
 
 InverseLogitLinkFunction _$InverseLogitLinkFunctionFromJson(
-    Map<String, dynamic> json) {
-  return $checkedNew('InverseLogitLinkFunction', json, () {
-    $checkKeys(json, allowedKeys: const []);
-    final val = InverseLogitLinkFunction();
-    return val;
-  });
-}
+        Map<String, dynamic> json) =>
+    $checkedCreate(
+      'InverseLogitLinkFunction',
+      json,
+      ($checkedConvert) {
+        $checkKeys(
+          json,
+          allowedKeys: const [],
+        );
+        final val = InverseLogitLinkFunction();
+        return val;
+      },
+    );
 
 Map<String, dynamic> _$InverseLogitLinkFunctionToJson(
         InverseLogitLinkFunction instance) =>
