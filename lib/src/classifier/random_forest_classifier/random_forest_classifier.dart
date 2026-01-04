@@ -145,4 +145,64 @@ abstract class RandomForestClassifier
   int get minSamplesCount;
   int get maxDepth;
   TreeAssessorType get assessorType;
+
+  /// Async version of predict that loads trees from store if needed
+  ///
+  /// This method will:
+  /// 1. Use in-memory trees if available (fast path)
+  /// 2. Load trees from treeStore if _trees is null but treeIds exist
+  /// 3. Throw error if trees are not available
+  Future<DataFrame> predictAsync(DataFrame features);
+
+  /// Async version of predictProbabilities that loads trees from store if needed
+  ///
+  /// This method will:
+  /// 1. Use in-memory trees if available (fast path)
+  /// 2. Load trees from treeStore if _trees is null but treeIds exist
+  /// 3. Throw error if trees are not available
+  Future<DataFrame> predictProbabilitiesAsync(DataFrame features);
+
+  /// Saves the forest to a TreeStore
+  ///
+  /// The forest metadata and tree IDs are saved. Individual trees should
+  /// already be saved to the store during training (if treeStore was provided).
+  ///
+  /// Parameters:
+  /// - [store] The TreeStore instance (must be SembastTreeStore)
+  /// - [forestId] Optional custom forest ID. If not provided, generates one.
+  ///
+  /// Returns the forest ID (String)
+  ///
+  /// Example:
+  /// ```dart
+  /// final store = SembastTreeStore(database: database);
+  /// final forest = RandomForestClassifier(
+  ///   trainData,
+  ///   'target',
+  ///   treeStore: store,
+  /// );
+  /// final forestId = await forest.saveToStore(store);
+  /// ```
+  Future<String> saveToStore(TreeStore store, {String? forestId});
+
+  /// Loads a RandomForestClassifier from a TreeStore
+  ///
+  /// Parameters:
+  /// - [store] The TreeStore instance (must be SembastTreeStore)
+  /// - [forestId] The ID of the forest to load
+  ///
+  /// Returns the loaded RandomForestClassifier, or null if not found
+  ///
+  /// Example:
+  /// ```dart
+  /// final store = SembastTreeStore(database: database);
+  /// final forest = await RandomForestClassifier.loadFromStore(store, forestId);
+  /// ```
+  static Future<RandomForestClassifier?> loadFromStore(
+    TreeStore store,
+    String forestId,
+  ) =>
+      initRandomForestModule()
+          .get<RandomForestClassifierFactory>()
+          .loadFromStore(store, forestId);
 }

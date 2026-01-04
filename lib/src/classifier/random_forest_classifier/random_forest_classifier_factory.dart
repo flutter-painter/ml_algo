@@ -27,4 +27,9 @@ abstract class RandomForestClassifierFactory {
   });
 
   RandomForestClassifier fromJson(String json);
+
+  Future<RandomForestClassifier?> loadFromStore(
+    TreeStore store,
+    String forestId,
+  );
 }

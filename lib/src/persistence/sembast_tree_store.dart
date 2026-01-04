@@ -22,8 +22,14 @@ class SembastTreeStore implements TreeStore {
   /// Store name for trees
   static const String treesStoreName = 'decision_trees';
 
-  /// Store reference
+  /// Store name for forests
+  static const String forestsStoreName = 'random_forests';
+
+  /// Store reference for trees
   final _treesStore = stringMapStoreFactory.store(treesStoreName);
+
+  /// Store reference for forests
+  final _forestsStore = stringMapStoreFactory.store(forestsStoreName);
 
   /// Creates a SembastTreeStore instance
   ///
@@ -171,5 +177,47 @@ class SembastTreeStore implements TreeStore {
       throw ArgumentError('Unknown dtype: $json');
     }
     return dtype;
+  }
+
+  /// Saves a RandomForestClassifier to the store
+  ///
+  /// This is a helper method used by RandomForestClassifier.saveToStore().
+  /// It stores forest metadata and tree IDs.
+  ///
+  /// Parameters:
+  /// - [forestId] The ID for the forest
+  /// - [metadata] Forest metadata map
+  ///
+  /// Returns the forest ID
+  Future<String> saveForest(String forestId, Map<String, dynamic> metadata) async {
+    await _forestsStore.record(forestId).put(database, {
+      'id': forestId,
+      'type': 'RandomForestClassifier',
+      ...metadata,
+    });
+    return forestId;
+  }
+
+  /// Loads RandomForestClassifier metadata from the store
+  ///
+  /// This is a helper method used by RandomForestClassifier.loadFromStore().
+  ///
+  /// Parameters:
+  /// - [forestId] The ID of the forest to load
+  ///
+  /// Returns the forest metadata, or null if not found
+  Future<Map<String, dynamic>?> loadForest(String forestId) async {
+    final record = await _forestsStore.record(forestId).get(database);
+    if (record == null) {
+      return null;
+    }
+    return record as Map<String, dynamic>?;
+  }
+
+  /// Generates a unique forest ID
+  String generateForestId() {
+    final timestamp = DateTime.now().millisecondsSinceEpoch;
+    final random = Random().nextInt(10000);
+    return 'forest_${timestamp}_$random';
   }
 }

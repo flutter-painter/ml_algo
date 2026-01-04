@@ -62,4 +62,12 @@ class RandomForestClassifierFactoryImpl
     final decodedJson = jsonDecode(json) as Map<String, dynamic>;
     return RandomForestClassifierImpl.fromJson(decodedJson);
   }
+
+  @override
+  Future<RandomForestClassifier?> loadFromStore(
+    TreeStore store,
+    String forestId,
+  ) async {
+    return RandomForestClassifierImpl.loadFromStore(store, forestId);
+  }
 }

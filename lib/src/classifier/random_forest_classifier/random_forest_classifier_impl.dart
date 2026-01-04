@@ -6,8 +6,14 @@ import 'package:ml_algo/src/classifier/decision_tree_classifier/decision_tree_cl
 import 'package:ml_algo/src/classifier/random_forest_classifier/random_forest_classifier.dart';
 import 'package:ml_algo/src/classifier/random_forest_classifier/voting_strategy.dart';
 import 'package:ml_algo/src/common/serializable/serializable_mixin.dart';
+import 'package:ml_algo/src/persistence/sembast_tree_store.dart';
 import 'package:ml_algo/src/persistence/tree_store.dart';
+import 'package:ml_algo/src/tree_trainer/tree_assessor/helpers/from_tree_assessor_type_json.dart';
+import 'package:ml_algo/src/tree_trainer/tree_assessor/helpers/to_tree_assessor_type_json.dart';
 import 'package:ml_algo/src/tree_trainer/tree_assessor/tree_assessor_type.dart';
+import 'package:ml_algo/src/classifier/random_forest_classifier/voting_strategy_json_converter.dart';
+import 'package:ml_linalg/dtype_to_json.dart';
+import 'package:ml_linalg/from_dtype_json.dart';
 import 'package:ml_algo/src/tree_trainer/tree_node/tree_node.dart';
 import 'package:ml_dataframe/ml_dataframe.dart';
 import 'package:ml_linalg/dtype.dart';
@@ -206,7 +212,7 @@ class RandomForestClassifierImpl
         // Save tree and collect ID
         // Using synchronous approach: keep trees in memory and save to store
         // This is a limitation - ideally this would be async
-        final treeId = _saveTreeSync(tree);
+        final treeId = _saveTreeSync(tree, treeIndex);
         treeIdsList.add(treeId);
       }
     }
@@ -541,12 +547,12 @@ class RandomForestClassifierImpl
   }
 
   /// Synchronously saves a tree to TreeStore (workaround for async limitation)
-  String _saveTreeSync(DecisionTreeClassifier tree) {
+  String _saveTreeSync(DecisionTreeClassifier tree, int treeIndex) {
     // Since saveToStore is async but we need synchronous training,
     // we'll use a workaround: generate ID first, then save with that ID
     // This ensures treeIds is populated immediately
     // Note: The actual save happens asynchronously, but we return the ID immediately
-    final treeId = 'tree_${DateTime.now().millisecondsSinceEpoch}_${_trees?.length ?? 0}';
+    final treeId = 'tree_${DateTime.now().millisecondsSinceEpoch}_$treeIndex';
     // Fire and forget - save happens in background
     tree.saveToStore(treeStore!, treeId: treeId);
     return treeId;
@@ -607,7 +613,88 @@ class RandomForestClassifierImpl
     return _aggregateProbabilities(probabilities, votingStrategy);
   }
 
-  // Removed _loadTrees - using _trees directly for now
+  /// Async version of predict that loads trees from store if needed
+  ///
+  /// This method will:
+  /// 1. Use in-memory trees if available (fast path)
+  /// 2. Load trees from treeStore if _trees is null but treeIds exist
+  /// 3. Throw error if trees are not available
+  Future<DataFrame> predictAsync(DataFrame features) async {
+    List<DecisionTreeClassifier> trees;
+
+    // Fast path: use in-memory trees if available
+    if (_trees != null) {
+      trees = _trees!;
+    } else if (treeStore != null && _treeIds != null && _treeIds!.isNotEmpty) {
+      // Load trees from store
+      trees = await _loadTreesFromStore();
+      if (trees.isEmpty) {
+        throw StateError(
+            'No trees could be loaded from store. Expected ${_treeIds!.length} trees, but loaded ${trees.length}.');
+      }
+      if (trees.length != _treeIds!.length) {
+        throw StateError(
+            'Not all trees could be loaded from store. Expected ${_treeIds!.length} trees, but loaded ${trees.length}.');
+      }
+      // Cache loaded trees for future use
+      _trees = trees;
+    } else {
+      throw StateError(
+          'Forest not trained. Trees not available in memory or store.');
+    }
+
+    return _predictSync(features, trees);
+  }
+
+  /// Async version of predictProbabilities that loads trees from store if needed
+  ///
+  /// This method will:
+  /// 1. Use in-memory trees if available (fast path)
+  /// 2. Load trees from treeStore if _trees is null but treeIds exist
+  /// 3. Throw error if trees are not available
+  Future<DataFrame> predictProbabilitiesAsync(DataFrame features) async {
+    List<DecisionTreeClassifier> trees;
+
+    // Fast path: use in-memory trees if available
+    if (_trees != null) {
+      trees = _trees!;
+    } else if (treeStore != null && _treeIds != null && _treeIds!.isNotEmpty) {
+      // Load trees from store
+      trees = await _loadTreesFromStore();
+      if (trees.isEmpty) {
+        throw StateError(
+            'No trees could be loaded from store. Expected ${_treeIds!.length} trees, but loaded ${trees.length}.');
+      }
+      if (trees.length != _treeIds!.length) {
+        throw StateError(
+            'Not all trees could be loaded from store. Expected ${_treeIds!.length} trees, but loaded ${trees.length}.');
+      }
+      // Cache loaded trees for future use
+      _trees = trees;
+    } else {
+      throw StateError(
+          'Forest not trained. Trees not available in memory or store.');
+    }
+
+    return _predictProbabilitiesSync(features, trees);
+  }
+
+  /// Loads trees from treeStore using stored treeIds
+  Future<List<DecisionTreeClassifier>> _loadTreesFromStore() async {
+    if (treeStore == null || _treeIds == null || _treeIds!.isEmpty) {
+      return [];
+    }
+
+    final trees = <DecisionTreeClassifier>[];
+    for (final treeId in _treeIds!) {
+      final tree = await treeStore!.loadTree(treeId);
+      if (tree != null) {
+        trees.add(tree);
+      }
+    }
+
+    return trees;
+  }
 
   DataFrame _aggregatePredictions(
     List<List<num>> predictions,
@@ -695,5 +782,134 @@ class RandomForestClassifierImpl
   RandomForestClassifier retrain(DataFrame data) {
     // TODO: Implement retraining
     throw UnimplementedError('Retraining not yet implemented');
+  }
+
+  @override
+  Future<String> saveToStore(TreeStore store, {String? forestId}) async {
+    if (store is! SembastTreeStore) {
+      throw ArgumentError(
+          'saveToStore requires SembastTreeStore, got ${store.runtimeType}');
+    }
+
+    final sembastStore = store;
+    final id = forestId ?? sembastStore.generateForestId();
+
+    // Prepare forest metadata
+    final metadata = <String, dynamic>{
+      'n_estimators': nEstimators,
+      'bootstrap': bootstrap,
+      'sample_size': sampleSize,
+      'max_features': maxFeatures?.toString() ?? 'null',
+      'voting_strategy': _votingStrategyToJson(votingStrategy),
+      'target_name': targetName,
+      'min_error': minError,
+      'min_samples_count': minSamplesCount,
+      'max_depth': maxDepth,
+      'assessor_type': toTreeAssessorTypeJson(assessorType),
+      'dtype': dTypeToJson(dtype),
+      'tree_ids': _treeIds ?? [],
+      'schema_version': schemaVersion,
+      'created_at': DateTime.now().toIso8601String(),
+      'seed': _seed,
+      'oob_score': _oobScore,
+      'feature_importance': _featureImportance ?? {},
+    };
+
+    await sembastStore.saveForest(id, metadata);
+    return id;
+  }
+
+  static Future<RandomForestClassifier?> loadFromStore(
+    TreeStore store,
+    String forestId,
+  ) async {
+    if (store is! SembastTreeStore) {
+      throw ArgumentError(
+          'loadFromStore requires SembastTreeStore, got ${store.runtimeType}');
+    }
+
+    final sembastStore = store;
+    final metadata = await sembastStore.loadForest(forestId);
+
+    if (metadata == null) {
+      return null;
+    }
+
+    // Parse voting strategy
+    final votingStrategyStr = metadata['voting_strategy'] as String;
+    final votingStrategy = _votingStrategyFromJson(votingStrategyStr);
+
+    // Parse maxFeatures
+    dynamic maxFeatures;
+    final maxFeaturesStr = metadata['max_features'] as String;
+    if (maxFeaturesStr == 'null') {
+      maxFeatures = null;
+    } else if (maxFeaturesStr == 'sqrt') {
+      maxFeatures = 'sqrt';
+    } else if (maxFeaturesStr == 'log2') {
+      maxFeatures = 'log2';
+    } else {
+      // Try to parse as number
+      final parsed = num.tryParse(maxFeaturesStr);
+      maxFeatures = parsed ?? maxFeaturesStr;
+    }
+
+    // Parse treeIds
+    final treeIdsList = (metadata['tree_ids'] as List<dynamic>?)
+            ?.map((e) => e as String)
+            .toList() ??
+        <String>[];
+
+    // Reconstruct forest
+    return RandomForestClassifierImpl(
+      nEstimators: metadata['n_estimators'] as int,
+      bootstrap: metadata['bootstrap'] as bool,
+      sampleSize: (metadata['sample_size'] as num).toDouble(),
+      maxFeatures: maxFeatures,
+      votingStrategy: votingStrategy,
+      targetName: metadata['target_name'] as String,
+      minError: metadata['min_error'] as num,
+      minSamplesCount: metadata['min_samples_count'] as int,
+      maxDepth: metadata['max_depth'] as int,
+      assessorType: fromTreeAssessorTypeJson(
+          metadata['assessor_type'] as String),
+      dtype: _parseDTypeFromJson(metadata['dtype'] as String),
+      treeStore: store,
+      seed: metadata['seed'] as int?,
+      schemaVersion: metadata['schema_version'] as int? ?? 1,
+      train: false, // Don't retrain, just load
+    ).._restoreFromMetadata(metadata, treeIdsList);
+  }
+
+  /// Restores internal state from loaded metadata
+  void _restoreFromMetadata(
+      Map<String, dynamic> metadata, List<String> treeIdsList) {
+    _treeIds = treeIdsList.isNotEmpty ? treeIdsList : null;
+    _oobScore = metadata['oob_score'] as double?;
+    _featureImportance =
+        (metadata['feature_importance'] as Map<String, dynamic>?)
+                ?.map((key, value) => MapEntry(key, (value as num).toDouble())) ??
+            {};
+  }
+
+  /// Converts VotingStrategy to JSON string
+  static String _votingStrategyToJson(VotingStrategy strategy) {
+    final converter = VotingStrategyJsonConverter();
+    return converter.toJson(strategy);
+  }
+
+  /// Converts JSON string to VotingStrategy
+  static VotingStrategy _votingStrategyFromJson(String json) {
+    final converter = VotingStrategyJsonConverter();
+    return converter.fromJson(json);
+  }
+
+  /// Parses DType from JSON string
+  static DType _parseDTypeFromJson(String json) {
+    final dtype = fromDTypeJson(json);
+    if (dtype == null) {
+      throw ArgumentError('Unknown dtype: $json');
+    }
+    return dtype;
   }
 }
